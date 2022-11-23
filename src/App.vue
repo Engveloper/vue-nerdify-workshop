@@ -6,51 +6,57 @@
     <div class="mb-12">
       <form @submit.prevent="handleAddTask">
         <div class="flex ml-8 space-x-4">
-          <input class="w-4" type="checkbox" name="" id="" />
           <input
+            v-model="task.completed"
+            class="w-4"
+            type="checkbox"
+            name=""
+            id=""
+          />
+          <input
+            v-model="task.title"
             class="bg-transparent w-96 text-lg focus:outline-none focus:ring-0 focus:border-transparent border-zinc-700"
             placeholder="Add a new task"
             type="text"
           />
-          <button type="button" @click="handleClick">Test</button>
         </div>
       </form>
     </div>
 
-    <div class="flex space-x-8 bg-white rounded w-1/2 p-8">
-      <input class="w-4" type="checkbox" />
-      <p>Test</p>
+    <div
+      v-for="(task, index) in tasks"
+      class="flex bg-white rounded w-1/2 p-8 mb-2 shadow-lg justify-between"
+    >
+      <div class="flex space-x-8">
+        <input v-model="tasks[index].completed" type="checkbox" />
+        <p :class="{ 'line-through': tasks[index].completed }">
+          {{ task.title }}
+        </p>
+      </div>
+      <button class="text-red-500">Delete</button>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, reactive, onMounted } from "vue";
+import { ref } from "vue";
 
 export default {
   setup() {
     const user = ref("John Doe");
     const task = ref({ title: "", completed: false });
 
-    onMounted(() => {
-      console.log("mounted");
-      setTimeout(() => {
-        console.log("timeout");
-        user.value = { name: "Jane Doe" };
-      }, 2000);
-    });
+    const tasks = ref([{ title: "Test", completed: false }]);
 
-    const handleClick = () => {
-      let test = user.value;
-      console.log({ test });
-      test = "Engels Doe";
-      // user.value.name = "Engels Doe";
-      console.log({ user });
+    const handleAddTask = () => {
+      tasks.value.push(task.value);
+      task.value = { title: "", completed: false };
     };
 
     return {
-      handleClick,
+      handleAddTask,
       task,
+      tasks,
       user,
     };
   },
