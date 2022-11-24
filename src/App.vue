@@ -23,38 +23,67 @@
       </form>
     </div>
 
-    <div
-      v-for="(task, index) in tasks"
-      class="flex bg-white rounded w-1/2 p-8 mb-2 shadow-lg justify-between"
+    <span v-if="!tasks.length" class="text-slate-400 ml-4"
+      >There is no tasks saved</span
     >
-      <div class="flex space-x-8">
-        <input v-model="tasks[index].completed" type="checkbox" />
-        <p :class="{ 'line-through': tasks[index].completed }">
-          {{ task.title }}
-        </p>
-      </div>
-      <button class="text-red-500">Delete</button>
-    </div>
+
+    <h2 v-if="pendingTasks.length" class="my-4">Pending Tasks</h2>
+
+    <TaskCard
+      v-for="task in pendingTasks"
+      :key="task.id"
+      :task="task"
+      @remove-task="handleRemoveTask(task.id)"
+    />
+
+    <h2 v-if="completedTasks.length" class="my-4">Completed Tasks</h2>
+    <TaskCard
+      v-for="task in completedTasks"
+      :key="task.id"
+      :task="task"
+      @remove-task="handleRemoveTask(task.id)"
+    />
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
+import { computed, ref } from "vue";
+import TaskCard from "./components/TaskCard.vue";
+
+import { v4 as uuidv4 } from "uuid";
 
 export default {
+  components: {
+    TaskCard,
+  },
+
   setup() {
     const user = ref("John Doe");
     const task = ref({ title: "", completed: false });
 
-    const tasks = ref([{ title: "Test", completed: false }]);
+    const tasks = ref([{ id: uuidv4(), title: "Test", completed: false }]);
 
     const handleAddTask = () => {
-      tasks.value.push(task.value);
+      tasks.value.push({ ...task.value, id: uuidv4() });
       task.value = { title: "", completed: false };
     };
 
+    const handleRemoveTask = (id) => {
+      tasks.value = tasks.value.filter((task) => task.id !== id);
+    };
+
+    const completedTasks = computed(() =>
+      tasks.value.filter((task) => task.completed)
+    );
+    const pendingTasks = computed(() =>
+      tasks.value.filter((task) => !task.completed)
+    );
+
     return {
+      completedTasks,
       handleAddTask,
+      handleRemoveTask,
+      pendingTasks,
       task,
       tasks,
       user,
