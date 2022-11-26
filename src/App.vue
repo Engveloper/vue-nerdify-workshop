@@ -4,33 +4,48 @@
   </h1>
   <div class="ml-4">
     <div class="mb-12">
-      <form>
+      <form @submit.prevent="addTask">
         <div class="flex ml-8 space-x-4">
-          <input class="w-4" type="checkbox" name="" id="" />
-          <input
+          <input v-model="completed" class="w-4" type="checkbox" />
+          <input v-model="title"
             class="bg-transparent w-96 text-lg focus:outline-none focus:ring-0 focus:border-transparent border-zinc-700"
-            placeholder="Add a new task"
-            type="text"
-          />
+            placeholder="Add a new task" type="text" />
         </div>
       </form>
     </div>
 
-    <div class="flex space-x-8 bg-white rounded w-1/2 p-8">
-      <input class="w-4" type="checkbox" />
-      <p>Test</p>
+    <div v-for="(task) in tasks" :key="task.id" class="flex space-x-8 bg-white rounded w-1/2 p-8 mb-4">
+      <input v-model="task.completed" class="w-4" type="checkbox" />
+      <p :class="{ 'line-through': task.completed }">{{ task.title }}</p>
     </div>
   </div>
 </template>
 
 <script>
+import { v4 as uuidv4 } from "uuid"
+
 export default {
   data() {
     return {
+      completed: false,
+      title: "",
+      tasks: [],
       user: {
         name: "John Doe",
       },
     };
+  },
+
+  methods: {
+    addTask() {
+      const task = {
+        id: uuidv4(),
+        title: this.title,
+        completed: this.completed
+      }
+
+      this.tasks.push(task);
+    },
   },
 };
 </script>
